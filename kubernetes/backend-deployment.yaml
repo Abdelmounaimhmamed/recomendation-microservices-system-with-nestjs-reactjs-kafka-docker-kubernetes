@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: backend-image:latest 
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_URI
+              value: "mongodb://myUserAdmin:abc123@mongodb:27017/mydb"
+          volumeMounts:
+            - name: backend-code
+              mountPath: /app
+      volumes:
+        - name: backend-code
+          hostPath:
+            path: ../nest_backend
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      nodePort: 30003 
+  selector:
+    app: backend
